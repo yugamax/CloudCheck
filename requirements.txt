@@ -1,0 +1,31 @@
+# Core Numerical & Geospatial
+numpy
+scipy
+pandas
+xarray
+rioxarray
+rasterio
+netCDF4
+h5py
+pyproj
+shapely
+geopandas
+
+# Deep Learning Framework
+torch
+torchvision
+torchaudio
+
+# API & Streaming Pipeline
+fastapi
+uvicorn[standard]
+pydantic
+redis
+celery
+websockets
+
+# Plotting & Utilities
+matplotlib
+pillow
+pyyaml
+requests

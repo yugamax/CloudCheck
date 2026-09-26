@@ -1,0 +1,43 @@
+﻿# Severe Convective Hazard Detection Thresholds (IMD & WMO calibrated)
+version: "1.0"
+
+radar_reflectivity_levels:
+  light_rain: 20.0       # dBZ
+  moderate_rain: 35.0    # dBZ
+  heavy_rain: 45.0       # dBZ
+  severe_core: 50.0      # dBZ (Likely hail / intense updraft core)
+  extreme_core: 55.0     # dBZ (Severe hail / violent storm)
+
+hazards:
+  cloudburst:
+    description: "Localized intense precipitation exceeding 100 mm/h"
+    marshall_palmer:
+      a: 200.0           # Z = a * R^b
+      b: 1.6
+    dbz_trigger: 52.0    # Equivalent to ~100 mm/h via standard Z-R
+    min_duration_mins: 20
+    warning_level: "RED"
+
+  hail:
+    description: "Maximum Expected Size of Hail (MESH) & probability"
+    posh_trigger_dbz: 45.0     # Probability of Severe Hail base reflectivity
+    mesh_threshold_mm: 20.0    # Diameter >= 20 mm triggers severe warning
+    freezing_level_km: 4.5     # Tropical pre-monsoon ~4.5-5.0 km AGL
+    warning_level: "ORANGE"
+
+  downburst_wind:
+    description: "Microburst & Damaging Straight-Line Winds"
+    radial_velocity_diff_ms: 25.0  # Velocity delta across couplet > 25 m/s
+    marc_signature_dbz: 40.0       # Mid-Altitude Radial Convergence threshold
+    warning_level: "ORANGE"
+
+  lightning:
+    description: "Total lightning strike density and convective initiation"
+    flash_density_threshold: 5.0   # Flashes / km^2 / 10 min
+    tir1_cooling_rate_k_min: -1.5  # Satellite cloud top cooling rate dT/dt
+    warning_level: "YELLOW"
+
+cap_alert_categories:
+  advisory: "YELLOW"
+  watch: "ORANGE"
+  warning: "RED"

@@ -1,0 +1,26 @@
+﻿model:
+  name: "SpatiotemporalConvectiveNowcaster"
+  architecture: "ConvLSTM_Seq2Seq"
+  in_channels: 3               # [Z (dBZ), V (m/s), TIR1 (K)]
+  out_channels: 1              # Predicted Z (Reflectivity)
+  hidden_dims: [64, 64, 32]
+  kernel_size: 3
+  sequence_lengths:
+    in_steps: 6                # 6 past steps (60 min context @ 10-min rate)
+    out_steps: 6               # 6 future steps (60 min nowcast horizon)
+
+training:
+  batch_size: 4
+  epochs: 50
+  learning_rate: 0.0003
+  weight_decay: 0.00001
+  loss_weights:
+    mse_base: 1.0
+    severe_core_multiplier: 5.0 # Upweights error when actual or predicted dBZ > 40
+    csi_weight: 0.5
+  mixed_precision: true
+
+inference:
+  device: "cuda"               # Fallback to "cpu" if no dedicated GPU
+  export_format: "onnx"
+  fp16: true
