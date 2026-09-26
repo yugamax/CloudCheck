@@ -1,0 +1,26 @@
+# Virtual Environment
+venv/
+env/
+ENV/
+
+# Python caches
+__pycache__/
+*.py[cod]
+*.class
+*.ipynb_checkpoints/
+
+# Data & Models
+data/raw/*
+data/processed/*
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+*.pt
+*.pth
+*.onnx
+*.nc
+*.h5
+
+# Local config & logs
+.env
+*.log
+.DS_Store

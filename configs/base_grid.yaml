@@ -1,0 +1,81 @@
+# ==============================================================================
+# Base Reference Spatial Grid & Normalization Configuration
+# Target: 0-6 Hour Convective Nowcasting at 1 km Resolution
+# ==============================================================================
+
+grid:
+  name: "kolkata_dwr_regional_domain"
+  description: "Standardized 1 km spatial meshgrid for convective storm nowcasting"
+  
+  # Spatial Reference System (SRS)
+  crs: "EPSG:4326"           # WGS 84 Lat/Lon (or EPSG:32645 / UTM Zone 45N for meter-exact projections)
+  spatial_dims:
+    x_dim: "longitude"
+    y_dim: "latitude"
+  
+  # Geographic Extents (covers ~300 km radius DWR sweep centered on ~22.57°N, 88.36°E)
+  bounds:
+    min_lat: 21.0            # South boundary
+    max_lat: 24.5            # North boundary
+    min_lon: 86.0            # West boundary
+    max_lon: 90.5            # East boundary
+  
+  # Resolution: 0.01 degrees corresponds to ~1.11 km at tropical/subtropical latitudes
+  resolution:
+    lat_step: 0.01           # Degrees latitude per grid cell (~1.1 km)
+    lon_step: 0.01           # Degrees longitude per grid cell (~1.03 km at 22°N)
+  
+  # Expected Tensor Spatial Dimensions: (max_lat - min_lat)/step x (max_lon - min_lon)/step
+  expected_dims:
+    height: 350              # Number of latitude cells
+    width: 450               # Number of longitude cells
+
+temporal:
+  timestep_minutes: 10       # Common synchronization interval across radar sweeps & satellite scans
+  input_sequence_length: 6   # Context window: Past 6 timesteps (1 hour history)
+  forecast_horizon: 6        # Prediction window: 6 timesteps (1 hour immediate nowcast)
+  max_lead_time_hours: 6     # Maximum nowcast extrapolation horizon
+
+channels:
+  channel_order:
+    - "radar_reflectivity"
+    - "radar_velocity"
+    - "satellite_tir1"
+    - "satellite_cooling_rate"
+    - "lightning_density"
+
+  normalization:
+    radar_reflectivity:
+      unit: "dBZ"
+      min_val: 0.0
+      max_val: 75.0
+      fill_val: 0.0
+      resampling_method: "bilinear"
+
+    radar_velocity:
+      unit: "m/s"
+      min_val: -50.0
+      max_val: 50.0
+      fill_val: 0.0
+      resampling_method: "nearest" # Avoid smoothing steep radial velocity shear couplets
+
+    satellite_tir1:
+      unit: "Kelvin"
+      min_val: 180.0
+      max_val: 320.0
+      fill_val: 320.0             # Warm fallback = clear sky / non-convective
+      resampling_method: "bilinear"
+
+    satellite_cooling_rate:
+      unit: "K/min"
+      min_val: -5.0               # Rapid convective cooling threshold (dT_b / dt)
+      max_val: 0.0
+      fill_val: 0.0
+      resampling_method: "bilinear"
+
+    lightning_density:
+      unit: "flashes/km2/min"
+      min_val: 0.0
+      max_val: 50.0
+      fill_val: 0.0
+      resampling_method: "sum"    # Spatial binning over 1 km cell
